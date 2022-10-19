@@ -1,8 +1,9 @@
 /* eslint-disable react/prop-types */
 import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { setCredentials } from '../features/auth/authSlice'
 import { selectCurrentUser } from '../features/auth/authSlice'
-import { Navigate, Link } from 'react-router-dom'
+import { Navigate, Link, useNavigate } from 'react-router-dom'
 import {
 	createStyles,
 	Menu,
@@ -15,37 +16,17 @@ import {
 	UnstyledButton,
 	Header,
 	Footer,
-	Aside,
 	Text,
 	MediaQuery,
 	Burger,
 	Space,
 	useMantineTheme,
-	Input
+	Input,
+	Button
 } from '@mantine/core'
-import { IconSearch, IconLogout, IconHeart,
-	IconStar,
-	IconMessage,
-	IconSettings,
-	IconPlayerPause,
-	IconTrash,
-	IconSwitchHorizontal,
-	IconChevronDown, } from '@tabler/icons'
+import { IconSearch, IconLogout, IconChevronDown, } from '@tabler/icons'
 
 const useStyles = createStyles((theme) => ({
-	header: {
-		paddingTop: theme.spacing.sm,
-		backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
-		borderBottom: `1px solid ${
-			theme.colorScheme === 'dark' ? 'transparent' : theme.colors.gray[2]
-		}`,
-		marginBottom: 120,
-	},
-
-	mainSection: {
-		paddingBottom: theme.spacing.sm,
-	},
-
 	user: {
 		color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
 		padding: `${theme.spacing.xs}px ${theme.spacing.sm}px`,
@@ -61,39 +42,8 @@ const useStyles = createStyles((theme) => ({
 		},
 	},
 
-	burger: {
-		[theme.fn.largerThan('xs')]: {
-			display: 'none',
-		},
-	},
-
 	userActive: {
 		backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.white,
-	},
-
-	tabs: {
-		[theme.fn.smallerThan('sm')]: {
-			display: 'none',
-		},
-	},
-
-	tabsList: {
-		borderBottom: '0 !important',
-	},
-
-	tab: {
-		fontWeight: 500,
-		height: 38,
-		backgroundColor: 'transparent',
-
-		'&:hover': {
-			backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[1],
-		},
-
-		'&[data-active]': {
-			backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.white,
-			borderColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.colors.gray[2],
-		},
 	},
 }))
 
@@ -119,14 +69,7 @@ const Root = () => {
 			navbarOffsetBreakpoint="sm"
 			asideOffsetBreakpoint="sm"
 			navbar={<RootNavBar opened={opened} />}
-			aside={
-				<MediaQuery smallerThan="sm" styles={{ display: 'none' }}>
-					<Aside p="md" hiddenBreakpoint="sm" width={{ sm: 200, lg: 300 }}>
-						<Text>Application sidebar</Text>
-					</Aside>
-				</MediaQuery>
-
-			}
+			aside={<></>}
 			footer={<RootFooter />}
 			header={<RootHeader theme={theme} opened={opened} setOpened={setOpened} user={currentUser}/>}
 		>
@@ -151,20 +94,21 @@ const RootNavBar = ({ opened }) => {
 	)
 }
 
-const RootAside = () => {
-	return (
-		<MediaQuery smallerThan="sm" styles={{ display: 'none' }}>
-			<Aside p="md" hiddenBreakpoint="sm" width={{ sm: 200, lg: 300 }}>
-				<Text>Application sidebar</Text>
-			</Aside>
-		</MediaQuery>
-	)
-}
-
 const RootHeader = ({ theme, opened, setOpened, user }) => {
 	const { classes, cx } = useStyles()
 	const [userMenuOpened, setUserMenuOpened] = useState(false)
 	const isLoading = false
+	const dispatch = useDispatch()
+	const navigate = useNavigate()
+
+	const onSignOutClicked = () => {
+		dispatch(setCredentials({
+			user: null,
+			token: null
+		}))
+		navigate('/signin')
+	}
+
 	return (
 		<Header height={70} p="md">
 			<div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
@@ -193,7 +137,7 @@ const RootHeader = ({ theme, opened, setOpened, user }) => {
 					/>
 					<Space w={150} />
 					<Menu
-						width={200}
+						width={150}
 						position="bottom-end"
 						transition="pop-top-right"
 						onClose={() => setUserMenuOpened(false)}
@@ -213,19 +157,9 @@ const RootHeader = ({ theme, opened, setOpened, user }) => {
 							</UnstyledButton>
 						</Menu.Target>
 						<Menu.Dropdown>
-							<Menu.Item color="red" icon={<IconTrash size={14} stroke={1.5} />}>
-                Delete account
-							</Menu.Item>
+							<Menu.Item color="red" icon={<IconLogout size={14} />} component={Button} onClick={onSignOutClicked}>Sign out</Menu.Item>
 						</Menu.Dropdown>
 					</Menu>
-					{/*<Menu zIndex={5}>
-						<Menu.Target>
-							<Avatar radius='xl' sx={{ cursor: 'pointer' }} src={null} color="indigo" />
-						</Menu.Target>
-						<Menu.Dropdown sx={{ zIndex: 5 }}>
-							<Menu.Item color="red" icon={<IconLogout size={14} />}>Logout</Menu.Item>
-						</Menu.Dropdown>
-					</Menu> */}
 				</Group>
 			</div>
 		</Header>

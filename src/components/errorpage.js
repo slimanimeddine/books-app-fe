@@ -1,16 +1,63 @@
 import React from 'react'
-import { useRouteError } from 'react-router-dom'
-import { Text } from '@mantine/core'
+import { useRouteError, Link } from 'react-router-dom'
+import { createStyles, Title, Text, Button, Container, Group } from '@mantine/core'
 
-export default function ErrorPage() {
+const useStyles = createStyles((theme) => ({
+	root: {
+		paddingTop: 80,
+		paddingBottom: 80,
+	},
+
+	label: {
+		textAlign: 'center',
+		fontWeight: 900,
+		fontSize: 220,
+		lineHeight: 1,
+		marginBottom: theme.spacing.xl * 1.5,
+		color: theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[2],
+
+		[theme.fn.smallerThan('sm')]: {
+			fontSize: 120,
+		},
+	},
+
+	title: {
+		fontFamily: `Greycliff CF, ${theme.fontFamily}`,
+		textAlign: 'center',
+		fontWeight: 900,
+		fontSize: 38,
+
+		[theme.fn.smallerThan('sm')]: {
+			fontSize: 32,
+		},
+	},
+
+	description: {
+		maxWidth: 500,
+		margin: 'auto',
+		marginTop: theme.spacing.xl,
+		marginBottom: theme.spacing.xl * 1.5,
+	},
+}))
+
+const ErrorPage = () => {
+	const { classes } = useStyles()
 	const error = useRouteError()
-	console.error(error)
 
 	return (
-		<>
-			<Text align="center" weight={700} sx={{ fontSize: 50 }}>Oops!</Text>
-			<Text align="center" size="lg">Sorry, an unexpected error has occurred.</Text>
-			<Text align="center" color="dimmed">{error.statusText || error.message}</Text>
-		</>
+		<Container className={classes.root}>
+			<div className={classes.label}>304</div>
+			<Title className={classes.title}>Sorry, an unexpected error has occurred.</Title>
+			<Text color="dimmed" size="lg" align="center" className={classes.description}>
+				{error.message || error.statusText}
+			</Text>
+			<Group position="center">
+				<Button component={Link} to="/signup" variant="subtle" size="md">
+          Take me back to home page
+				</Button>
+			</Group>
+		</Container>
 	)
 }
+
+export default ErrorPage
