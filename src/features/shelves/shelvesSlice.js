@@ -1,14 +1,16 @@
 /* eslint-disable no-unused-vars */
 import { apiSlice } from '../api/apiSlice'
+import { store } from '../../app/store'
 
 export const shelvesApiSlice = apiSlice.injectEndpoints({
 	endpoints: ({ query, mutation }) => ({
 		getShelves: query({
 			query: () => '/shelves',
-			providesTags: (result = [], error, arg) => [
-				'shelf',
-				...result.map(({ id }) => ({ type: 'shelf', id }))
-			]
+			//transformResponse: res => res.filter(shelf => shelf.user === store.getState().auth.user.id),
+			//providesTags: (result = [], error, arg) => [
+			//	'shelf',
+			//	...result.map(({ id }) => ({ type: 'shelf', id }))
+			//]
 		}),
 		getShelf: query({
 			query: shelfId => `/shelves/${shelfId}`,
