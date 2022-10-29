@@ -9,15 +9,21 @@ import {
 	ActionIcon,
 	Tooltip,
 	ScrollArea,
-	Loader
+	Loader,
+	Button,
+	Collapse
 } from '@mantine/core'
+import { useForm } from '@mantine/form'
 import {
 	IconSearch,
 	IconPlus,
 } from '@tabler/icons'
-import React from 'react'
+import React, {
+	useState
+} from 'react'
 import {
-	useGetShelvesQuery
+	useGetShelvesQuery,
+	useAddNewShelfMutation
 } from '../features/shelves/shelvesSlice'
 
 const useStyles = createStyles((theme) => ({
@@ -120,13 +126,27 @@ const links = [
 	{ label: 'All' },
 ]
 
-const bookshelves = [
-	{ label: 'shelf a' },
-	{ label: 'shelf b' },
-	{ label: 'shelf c' },
-]
-
 const RootNavBar = () => {
+	const [addShelfFormOpened, setAddShelfFormOpened] = useState(false)
+	const addShelfForm = useForm({
+		initialValues: {
+			shelfName: ''
+		}
+	})
+	const [addNewShelf, addNewShelfState] = useAddNewShelfMutation()
+	const canAddNewShelf = addShelfForm.values.shelfName && !addNewShelfState.isLoading
+	const onAddNewShelfClicked = async () => {
+		if (canAddNewShelf) {
+			try {
+				await addNewShelf({
+					name: addShelfForm.values.shelfName
+				}).unwrap()
+				addShelfForm.reset()
+			} catch (err) {
+				window.alert(err.data.error)
+			}
+		}
+	}
 	const { classes } = useStyles()
 	const {
 		data: shelves,
@@ -135,18 +155,18 @@ const RootNavBar = () => {
 		isError,
 		error
 	} = useGetShelvesQuery()
-	console.log(useGetShelvesQuery())
 
-	//	if (isLoading) {
-	//		bookshelves = <Loader />
-	//	} else if (isSuccess) {
-	//		bookshelves = shelves.map(shelf => ({
-	//			label: shelf.name
-	//		}))
-	//	} else if (isError) {
-	//		bookshelves = <div>{error.toString()}</div>
-	//	}
-	//
+	let bookshelves
+
+	if (isLoading) {
+		bookshelves = <Loader />
+	} else if (isSuccess) {
+		bookshelves = shelves.map(shelf => ({
+			label: shelf.name
+		}))
+	} else if (isError) {
+		bookshelves = <div>{error.toString()}</div>
+	}
 	const mainLinks = links.map((link) => (
 		<UnstyledButton key={link.label} className={classes.mainLink}>
 			<div className={classes.mainLinkInner}>
@@ -188,12 +208,25 @@ const RootNavBar = () => {
 						Bookshelves
 					</Text>
 					<Tooltip label="add shelf" withArrow position="right">
-						<ActionIcon variant="default" size={18}>
+						<ActionIcon component={Button} onClick={() => setAddShelfFormOpened(o => !o)} variant="default" size={18}>
 							<IconPlus size={12} stroke={1.5} />
 						</ActionIcon>
 					</Tooltip>
 				</Group>
 				<div className={classes.collections}>{bookshelvesLinks}</div>
+				<Collapse in={addShelfFormOpened}>
+					<form>
+						<Group spacing='xs' position='center'>
+							<TextInput
+								placeholder="add shelf"
+								size="xs"
+								rightSection={null}
+								{...addShelfForm.getInputProps('shelfName')}
+							/>
+							<Button type='button' size='xs' color='gray' onClick={onAddNewShelfClicked} disabled={!canAddNewShelf}>add</Button>
+						</Group>
+					</form>
+				</Collapse>
 			</Navbar.Section>
 		</Navbar>
 	)

@@ -6,11 +6,11 @@ export const shelvesApiSlice = apiSlice.injectEndpoints({
 	endpoints: ({ query, mutation }) => ({
 		getShelves: query({
 			query: () => '/shelves',
-			//transformResponse: res => res.filter(shelf => shelf.user === store.getState().auth.user.id),
-			//providesTags: (result = [], error, arg) => [
-			//	'shelf',
-			//	...result.map(({ id }) => ({ type: 'shelf', id }))
-			//]
+			transformResponse: res => res.filter(shelf => shelf.user.id === store.getState().auth.user.id),
+			providesTags: (result = [], error, arg) => [
+				'shelf',
+				...result.map(({ id }) => ({ type: 'shelf', id }))
+			]
 		}),
 		getShelf: query({
 			query: shelfId => `/shelves/${shelfId}`,
