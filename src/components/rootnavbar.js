@@ -161,13 +161,22 @@ const RootNavBar = () => {
 	if (isLoading) {
 		bookshelves = <Loader />
 	} else if (isSuccess) {
-		bookshelves = shelves.map(shelf => ({
+		bookshelves = shelves?.map(shelf => ({
 			label: shelf.name
-		}))
+		})).map((bookshelf) => (
+			<a
+				href="/"
+				onClick={(event) => event.preventDefault()}
+				key={bookshelf?.label}
+				className={classes.collectionLink}
+			>
+				{bookshelf?.label}
+			</a>
+		))
 	} else if (isError) {
 		bookshelves = <div>{error.toString()}</div>
 	}
-	const mainLinks = links.map((link) => (
+	const mainLinks = links?.map((link) => (
 		<UnstyledButton key={link.label} className={classes.mainLink}>
 			<div className={classes.mainLinkInner}>
 				<span>{link.label}</span>
@@ -175,16 +184,6 @@ const RootNavBar = () => {
 		</UnstyledButton>
 	))
 
-	const bookshelvesLinks = bookshelves.map((bookshelf) => (
-		<a
-			href="/"
-			onClick={(event) => event.preventDefault()}
-			key={bookshelf.label}
-			className={classes.collectionLink}
-		>
-			{bookshelf.label}
-		</a>
-	))
 
 	return (
 		<Navbar height={700} width={{ sm: 300 }} p="md" className={classes.navbar}>
@@ -213,7 +212,7 @@ const RootNavBar = () => {
 						</ActionIcon>
 					</Tooltip>
 				</Group>
-				<div className={classes.collections}>{bookshelvesLinks}</div>
+				<div className={classes.collections}>{bookshelves}</div>
 				<Collapse in={addShelfFormOpened}>
 					<form>
 						<Group spacing='xs' position='center'>

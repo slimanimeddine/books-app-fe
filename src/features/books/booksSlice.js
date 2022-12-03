@@ -1,9 +1,11 @@
 import { apiSlice } from '../api/apiSlice'
+import { store } from '../../app/store'
 
 export const booksApiSlice = apiSlice.injectEndpoints({
 	endpoints: ({ query, mutation }) => ({
 		getBooks: query({
 			query: () => '/books',
+			transformResponse: res => res.filter(book => book.user.id === store.getState().auth.user.id),
 			providesTags: (result = [], error, arg) => [
 				'book',
 				...result.map(({ id }) => ({ type: 'book', id }))

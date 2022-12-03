@@ -37,7 +37,7 @@ const Root = () => {
 			footer={<RootFooter />}
 			header={<RootHeader theme={theme} opened={opened} setOpened={setOpened} user={currentUser}/>}
 		>
-			<RootMain currentUser={currentUser} />
+			<RootMain />
 		</AppShell>
 	)
 }
